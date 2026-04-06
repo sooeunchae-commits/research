@@ -2,115 +2,547 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>연구방법론 특강 — 학생 활동지</title>
 <style>
-  /* 아이패드 및 모바일 최적화 스타일 */
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f6fa; color: #1a1a2e; line-height: 1.6; word-break: keep-all; }
-  
-  /* 헤더 및 진행바 고정 */
-  .page-header { background: #1a1a2e; color: #fff; padding: env(safe-area-inset-top) 1.5rem 1.5rem; text-align: center; }
-  .progress-bar { background: #16213e; padding: 0.75rem; display: flex; justify-content: center; align-items: center; gap: 8px; sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-  
-  .step-dot { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; background: #2d3561; color: #8b9dc3; cursor: pointer; transition: 0.2s; }
-  .step-dot.active { background: #e94560; color: #fff; transform: scale(1.1); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background: #f5f6fa; color: #1a1a2e; line-height: 1.6; }
+
+  .page-header { background: #1a1a2e; color: #fff; padding: 2rem 1.5rem 1.5rem; }
+  .page-header .badge { display: inline-block; background: #e94560; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; margin-bottom: 0.75rem; letter-spacing: 0.5px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 0.4rem; }
+  .page-header p { font-size: 13px; color: #8b9dc3; }
+
+  .progress-bar { background: #16213e; padding: 0.75rem 1.5rem; display: flex; gap: 8px; align-items: center; overflow-x: auto; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; cursor: pointer; transition: opacity 0.2s; }
+  .step-dot.active { background: #e94560; color: #fff; }
   .step-dot.done { background: #27ae60; color: #fff; }
-  .step-line { width: 20px; height: 2px; background: #2d3561; }
+  .step-dot.pending { background: #2d3561; color: #8b9dc3; }
+  .step-line { flex: 1; height: 1px; background: #2d3561; min-width: 12px; }
 
-  .container { max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
-  .section { display: none; animation: slideIn 0.3s ease-out; }
+  .container { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+  .section { display: none; }
   .section.active { display: block; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .card { background: #fff; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-  
-  /* 입력창 최적화 */
-  input[type="text"], textarea { 
-    width: 100%; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px; 
-    font-size: 16px; /* 아이패드 자동 줌 방지 */
-    background: #fdfdfd; appearance: none; -webkit-appearance: none;
+  .section-header { border-radius: 10px 10px 0 0; padding: 1rem 1.25rem; margin-bottom: 0; }
+  .section-header.red { background: #e94560; }
+  .section-header.amber { background: #f5a623; }
+  .section-header.teal { background: #1abc9c; }
+  .section-header.green { background: #27ae60; }
+  .section-header .step-label { font-size: 11px; color: rgba(255,255,255,0.75); font-weight: 700; margin-bottom: 4px; }
+  .section-header h2 { font-size: 17px; color: #fff; font-weight: 700; }
+  .section-header p { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+
+  .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+  .card.header-attached { border-radius: 0 0 10px 10px; margin-top: 0; }
+
+  label.field-label { display: block; font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .field-hint { font-size: 11px; color: #718096; margin-bottom: 8px; }
+  input[type="text"], textarea, select {
+    width: 100%; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 9px 12px; font-size: 14px; font-family: inherit;
+    background: #fafbff; color: #1a1a2e; transition: border-color 0.15s;
+    resize: vertical;
   }
-  input:focus, textarea:focus { outline: none; border-color: #4a90d9; background: #fff; }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none; border-color: #4a90d9; background: #fff;
+  }
+  textarea { min-height: 80px; }
 
-  /* 버튼 스타일 */
-  .nav-row { display: flex; gap: 10px; position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 1rem; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-  .btn { flex: 1; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; }
-  .btn-prev { background: #edf2f7; color: #4a5568; }
+  .field-group { margin-bottom: 1rem; }
+
+  .finer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 0.75rem 0; }
+  .finer-chip { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: #fafbff; }
+  .finer-chip:hover { border-color: #4a90d9; background: #e6f1fb; }
+  .finer-chip.checked { border-color: #1abc9c; background: #e1f5ee; }
+  .finer-chip .letter { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+  .finer-chip .word { font-size: 10px; color: #718096; margin-top: 2px; }
+  .finer-chip .meaning { font-size: 12px; font-weight: 700; margin-top: 4px; color: #2d3748; }
+  .finer-chip.checked .letter { color: #0f6e56; }
+  .finer-chip.checked .meaning { color: #0f6e56; }
+
+  .problem-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; background: #fafbff; }
+  .problem-card .problem-num { font-size: 11px; font-weight: 700; color: #e94560; margin-bottom: 6px; }
+
+  .var-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .var-box { border-radius: 8px; padding: 1rem; }
+  .var-box.iv { background: #fff0f3; border: 1px solid #f4c0d1; }
+  .var-box.dv { background: #e1f5ee; border: 1px solid #9fe1cb; }
+  .var-box.cv { background: #eaf3de; border: 1px solid #c0dd97; }
+  .var-box .var-label { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .var-box.iv .var-label { color: #993556; }
+  .var-box.dv .var-label { color: #0f6e56; }
+  .var-box.cv .var-label { color: #3b6d11; }
+
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 0.75rem 0; }
+  .method-chip { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: #fafbff; }
+  .method-chip:hover { border-color: #4a90d9; }
+  .method-chip.selected { border-color: #1abc9c; background: #e1f5ee; }
+  .method-chip .m-icon { font-size: 20px; margin-bottom: 4px; }
+  .method-chip .m-name { font-size: 13px; font-weight: 700; color: #2d3748; }
+  .method-chip.selected .m-name { color: #0f6e56; }
+
+  .ethics-list { list-style: none; }
+  .ethics-list li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #e2e8f0; }
+  .ethics-list li:last-child { border-bottom: none; }
+  .ethics-check { width: 20px; height: 20px; border: 2px solid #e2e8f0; border-radius: 4px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; margin-top: 1px; }
+  .ethics-check.checked { background: #27ae60; border-color: #27ae60; }
+  .ethics-check.checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
+  .ethics-text { font-size: 13px; color: #2d3748; }
+
+  .pres-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 0.5rem; }
+  .pres-time { background: #e1f5ee; color: #0f6e56; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 4px 8px; flex-shrink: 0; margin-top: 2px; }
+
+  .feedback-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .feedback-table th { background: #e6f1fb; color: #0c447c; font-weight: 700; padding: 8px 10px; border: 1px solid #b5d4f4; text-align: left; }
+  .feedback-table td { border: 1px solid #e2e8f0; padding: 6px 8px; vertical-align: top; }
+  .feedback-table td input { border: none; background: transparent; width: 100%; font-size: 13px; font-family: inherit; color: #1a1a2e; }
+  .feedback-table td input:focus { outline: none; }
+  .feedback-table td textarea { border: none; background: transparent; width: 100%; font-size: 12px; font-family: inherit; color: #1a1a2e; min-height: 48px; resize: none; }
+  .feedback-table td textarea:focus { outline: none; }
+
+  .tip-box { background: #fffbeb; border-left: 3px solid #f5a623; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin: 0.75rem 0; font-size: 12px; color: #744210; }
+
+  .nav-row { display: flex; gap: 8px; justify-content: space-between; margin-top: 1.5rem; }
+  .btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-prev { background: #f0f4ff; color: #4a5568; }
+  .btn-prev:hover { background: #e2e8f0; }
   .btn-next { background: #1a1a2e; color: #fff; }
-  .btn-submit { background: #e94560; color: #fff; }
+  .btn-next:hover { background: #2d3561; }
+  .btn-submit { background: #e94560; color: #fff; flex: 1; }
+  .btn-submit:hover { background: #c73651; }
 
-  @media print { .nav-row, .progress-bar { display: none; } .section { display: block !important; } }
+  .result-card { text-align: center; padding: 3rem 1.5rem; }
+  .result-icon { font-size: 48px; margin-bottom: 1rem; }
+  .result-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 0.5rem; }
+  .result-card p { font-size: 14px; color: #718096; margin-bottom: 1.5rem; }
+  .result-summary { text-align: left; background: #f5f6fa; border-radius: 10px; padding: 1rem 1.25rem; margin-top: 1rem; }
+  .result-summary .rs-row { padding: 8px 0; border-bottom: 0.5px solid #e2e8f0; font-size: 13px; }
+  .result-summary .rs-row:last-child { border-bottom: none; }
+  .result-summary .rs-label { color: #718096; font-size: 11px; margin-bottom: 2px; }
+  .result-summary .rs-val { color: #1a1a2e; font-weight: 500; }
+  .btn-print { background: #1a1a2e; color: #fff; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-top: 1rem; }
+
+  @media (max-width: 500px) {
+    .var-grid { grid-template-columns: 1fr; }
+    .finer-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media print {
+    .progress-bar, .nav-row, .page-header .badge { display: none; }
+    .section { display: block !important; margin-bottom: 2rem; }
+    body { background: #fff; }
+  }
 </style>
 </head>
 <body>
 
 <div class="page-header">
-  <h1>연구방법론 PBL 활동지</h1>
-  <p>팀별 미니 연구 계획서 작성</p>
+  <div class="badge">연구방법론 특강 · PBL 활동지</div>
+  <h1>우리 팀의 미니 연구 계획서</h1>
+  <p>고등학교 1학년 · 문제기반학습(PBL) · 팀별 공동 작성</p>
 </div>
 
-<div class="progress-bar" id="dots">
-  <div class="step-dot active" onclick="go(0)">팀</div>
+<div class="progress-bar" id="progressBar">
+  <div class="step-dot active" onclick="goStep(0)" id="dot0">팀</div>
   <div class="step-line"></div>
-  <div class="step-dot" onclick="go(1)">①</div>
+  <div class="step-dot pending" onclick="goStep(1)" id="dot1">①</div>
   <div class="step-line"></div>
-  <div class="step-dot" onclick="go(2)">②</div>
+  <div class="step-dot pending" onclick="goStep(2)" id="dot2">②</div>
   <div class="step-line"></div>
-  <div class="step-dot" onclick="go(3)">③</div>
+  <div class="step-dot pending" onclick="goStep(3)" id="dot3">③</div>
   <div class="step-line"></div>
-  <div class="step-dot" onclick="go(4)">④</div>
+  <div class="step-dot pending" onclick="goStep(4)" id="dot4">④</div>
+  <div class="step-line"></div>
+  <div class="step-dot pending" onclick="goStep(5)" id="dot5">완료</div>
 </div>
 
 <div class="container">
-  <form id="pblForm">
-    <div class="section active" id="sec0">
-      <div class="card">
-        <h3>우리 팀 정보</h3>
-        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">내용은 기기에 자동으로 저장됩니다.</p>
-        <label>팀 이름</label>
-        <input type="text" name="teamName" id="teamName" placeholder="예: 뉴턴의 사과">
-        <label style="margin-top:15px; display:block;">팀원</label>
-        <input type="text" name="members" id="members" placeholder="이름을 쉼표로 구분">
+
+  <!-- STEP 0: 팀 정보 -->
+  <div class="section active" id="sec0">
+    <div class="section-header red">
+      <div class="step-label">시작하기</div>
+      <h2>팀 정보를 입력해 주세요</h2>
+      <p>기록자가 대표로 작성하세요</p>
+    </div>
+    <div class="card header-attached">
+      <div class="field-group">
+        <label class="field-label">팀 이름</label>
+        <input type="text" id="teamName" placeholder="우리 팀의 이름을 정해보세요">
       </div>
-      <div class="nav-row">
-        <button type="button" class="btn btn-next" onclick="go(1)">다음 단계로</button>
+      <div class="field-group">
+        <label class="field-label">팀원 이름</label>
+        <div class="field-hint">쉼표로 구분해서 입력하세요 (예: 김민준, 이서연, 박지호)</div>
+        <input type="text" id="teamMembers" placeholder="팀원 이름 모두 입력">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group">
+          <label class="field-label">기록자</label>
+          <input type="text" id="recorder" placeholder="기록자 이름">
+        </div>
+        <div class="field-group">
+          <label class="field-label">발표자</label>
+          <input type="text" id="presenter" placeholder="발표자 이름">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">날짜</label>
+        <input type="text" id="dateField" placeholder="예: 2025년 4월 6일">
+      </div>
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-next" onclick="next(0)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: 연구 문제 -->
+  <div class="section" id="sec1">
+    <div class="section-header red">
+      <div class="step-label">활동 ① · 15~45분</div>
+      <h2>연구 문제 만들기</h2>
+      <p>FINER 기준으로 좋은 연구 문제를 골라보세요</p>
+    </div>
+    <div class="card header-attached">
+      <label class="field-label">FINER 기준 — 아래 조건을 클릭해 체크해보세요</label>
+      <div class="field-hint">우리 연구 문제가 이 조건들을 얼마나 만족하는지 확인하세요</div>
+      <div class="finer-grid">
+        <div class="finer-chip" onclick="toggleFiner(this)">
+          <div class="letter">F</div>
+          <div class="word">Feasible</div>
+          <div class="meaning">실행 가능한</div>
+        </div>
+        <div class="finer-chip" onclick="toggleFiner(this)">
+          <div class="letter">I</div>
+          <div class="word">Interesting</div>
+          <div class="meaning">흥미로운</div>
+        </div>
+        <div class="finer-chip" onclick="toggleFiner(this)">
+          <div class="letter">N</div>
+          <div class="word">Novel</div>
+          <div class="meaning">새로운</div>
+        </div>
+        <div class="finer-chip" onclick="toggleFiner(this)">
+          <div class="letter">E</div>
+          <div class="word">Ethical</div>
+          <div class="meaning">윤리적인</div>
+        </div>
+        <div class="finer-chip" onclick="toggleFiner(this)">
+          <div class="letter">R</div>
+          <div class="word">Relevant</div>
+          <div class="meaning">관련성 있는</div>
+        </div>
       </div>
     </div>
 
-    <div class="section" id="sec4">
-      <div class="card">
-        <h3>최종 제출</h3>
-        <p>모든 내용을 확인했나요? 인쇄 버튼을 눌러 PDF로 저장하세요.</p>
-        <div id="resultView" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:10px;"></div>
+    <div class="card">
+      <label class="field-label">후보 연구 문제 3가지를 적어보세요</label>
+      <div class="field-hint">학교생활에서 '왜 그럴까?', '어떻게 바꿀 수 있을까?' 라는 질문에서 시작하세요</div>
+      <div class="problem-card">
+        <div class="problem-num">후보 1번</div>
+        <textarea id="q1" placeholder="예: 수면 시간이 짧을수록 학교 수업 집중도가 낮아질까?"></textarea>
       </div>
-      <div class="nav-row">
-        <button type="button" class="btn btn-prev" onclick="go(3)">이전</button>
-        <button type="button" class="btn btn-submit" onclick="window.print()">PDF 저장 / 인쇄</button>
+      <div class="problem-card">
+        <div class="problem-num">후보 2번</div>
+        <textarea id="q2" placeholder="학교생활에서 궁금한 점을 질문으로 써보세요"></textarea>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">후보 3번</div>
+        <textarea id="q3" placeholder="학교생활에서 궁금한 점을 질문으로 써보세요"></textarea>
       </div>
     </div>
-  </form>
+
+    <div class="card">
+      <label class="field-label">최종 선택 연구 문제</label>
+      <div class="field-hint">위 3개 중 팀이 가장 잘 탐구할 수 있는 문제를 선택하고, 이유를 함께 써주세요</div>
+      <div class="field-group">
+        <textarea id="finalQ" placeholder="최종 연구 문제를 구체적으로 써주세요" style="min-height:70px;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label" style="font-weight:500;font-size:12px;">선택 이유</label>
+        <textarea id="finalReason" placeholder="왜 이 문제를 선택했나요?" style="min-height:55px;"></textarea>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-prev" onclick="prev(1)">← 이전</button>
+      <button class="btn btn-next" onclick="next(1)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: 가설 & 변수 -->
+  <div class="section" id="sec2">
+    <div class="section-header amber">
+      <div class="step-label">활동 ② · 45~75분</div>
+      <h2>가설 & 변수 설정</h2>
+      <p>'~할수록 ~할 것이다' 형식으로 가설을 세워보세요</p>
+    </div>
+    <div class="card header-attached">
+      <label class="field-label">우리 팀의 가설</label>
+      <div class="field-hint">예: "수면 시간이 길수록 다음날 수업 집중도가 높을 것이다"</div>
+      <textarea id="hypothesis" placeholder="가설을 '~할수록 ~할 것이다' 형식으로 작성해 주세요" style="min-height:70px;"></textarea>
+
+      <div class="tip-box">가설은 검증 가능한 예측이어야 합니다. 숫자나 관찰로 확인할 수 있는지 생각해보세요.</div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">변수 구분하기</label>
+      <div class="field-hint">우리 가설에서 세 가지 변수를 찾아 써보세요</div>
+      <div class="var-grid">
+        <div class="var-box iv">
+          <div class="var-label">독립변수 (원인)</div>
+          <textarea id="iv" placeholder="내가 바꾸는 것&#10;예: 수면 시간" style="min-height:80px;background:transparent;border:none;padding:0;font-size:13px;"></textarea>
+        </div>
+        <div class="var-box dv">
+          <div class="var-label">종속변수 (결과)</div>
+          <textarea id="dv" placeholder="결과로 나타나는 것&#10;예: 집중도 점수" style="min-height:80px;background:transparent;border:none;padding:0;font-size:13px;"></textarea>
+        </div>
+        <div class="var-box cv">
+          <div class="var-label">통제변수 (일정하게)</div>
+          <textarea id="cv" placeholder="같은 조건으로 유지할 것&#10;예: 학년, 성별" style="min-height:80px;background:transparent;border:none;padding:0;font-size:13px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-prev" onclick="prev(2)">← 이전</button>
+      <button class="btn btn-next" onclick="next(2)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: 연구 방법 & 윤리 -->
+  <div class="section" id="sec3">
+    <div class="section-header teal">
+      <div class="step-label">활동 ③ · 75~100분</div>
+      <h2>연구 방법 계획 & 윤리 점검</h2>
+      <p>데이터를 어떻게 모을지 계획하고 윤리를 확인해요</p>
+    </div>
+    <div class="card header-attached">
+      <label class="field-label">연구 방법 선택 (해당하는 것 모두 클릭)</label>
+      <div class="method-grid">
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">📋</div>
+          <div class="m-name">설문조사</div>
+        </div>
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">👀</div>
+          <div class="m-name">관찰법</div>
+        </div>
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">🧪</div>
+          <div class="m-name">실험법</div>
+        </div>
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">💬</div>
+          <div class="m-name">인터뷰</div>
+        </div>
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">📚</div>
+          <div class="m-name">문헌조사</div>
+        </div>
+        <div class="method-chip" onclick="toggleMethod(this)">
+          <div class="m-icon">✏️</div>
+          <div class="m-name">기타</div>
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:0.5rem;">
+        <label class="field-label" style="font-size:12px;font-weight:500;">선택 이유</label>
+        <textarea id="methodReason" placeholder="왜 이 방법이 우리 연구에 적합한가요?" style="min-height:55px;"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">구체적인 데이터 수집 계획</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group">
+          <label class="field-label" style="font-size:12px;font-weight:500;">누구에게? 몇 명?</label>
+          <textarea id="dataWho" placeholder="예: 1학년 학생 30명" style="min-height:65px;"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label" style="font-size:12px;font-weight:500;">어떤 방식으로? 언제?</label>
+          <textarea id="dataHow" placeholder="예: 아침 조회 시간에 설문지 배부" style="min-height:65px;"></textarea>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" style="font-size:12px;font-weight:500;">예상 어려운 점 & 해결 방법</label>
+        <textarea id="challenge" placeholder="어떤 어려움이 있을까요? 어떻게 해결할 수 있을까요?" style="min-height:55px;"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">연구윤리 점검</label>
+      <div class="field-hint">모두 확인하고 체크해 주세요</div>
+      <ul class="ethics-list">
+        <li>
+          <div class="ethics-check" onclick="toggleEthics(this)"></div>
+          <span class="ethics-text">참여자에게 연구 목적을 미리 설명하고 동의를 구할 것이다</span>
+        </li>
+        <li>
+          <div class="ethics-check" onclick="toggleEthics(this)"></div>
+          <span class="ethics-text">참여자의 이름 등 개인정보는 익명으로 처리할 것이다</span>
+        </li>
+        <li>
+          <div class="ethics-check" onclick="toggleEthics(this)"></div>
+          <span class="ethics-text">수집한 데이터를 있는 그대로 기록하고 조작하지 않을 것이다</span>
+        </li>
+        <li>
+          <div class="ethics-check" onclick="toggleEthics(this)"></div>
+          <span class="ethics-text">다른 자료를 인용할 때 출처를 반드시 밝힐 것이다</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-prev" onclick="prev(3)">← 이전</button>
+      <button class="btn btn-next" onclick="next(3)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: 발표 & 피드백 -->
+  <div class="section" id="sec4">
+    <div class="section-header green">
+      <div class="step-label">활동 ④ · 100~120분</div>
+      <h2>발표 준비 & 상호 피드백</h2>
+      <p>3분 발표를 준비하고, 다른 팀 발표에 피드백을 남겨요</p>
+    </div>
+    <div class="card header-attached">
+      <label class="field-label">발표 내용 준비 (팀당 3분)</label>
+      <div class="pres-row">
+        <div class="pres-time">30초</div>
+        <div style="flex:1;">
+          <textarea id="pres1" placeholder="팀 소개 & 연구 주제" style="min-height:55px;"></textarea>
+        </div>
+      </div>
+      <div class="pres-row">
+        <div class="pres-time">45초</div>
+        <div style="flex:1;">
+          <textarea id="pres2" placeholder="연구 문제와 가설" style="min-height:55px;"></textarea>
+        </div>
+      </div>
+      <div class="pres-row">
+        <div class="pres-time">60초</div>
+        <div style="flex:1;">
+          <textarea id="pres3" placeholder="연구 방법 계획" style="min-height:55px;"></textarea>
+        </div>
+      </div>
+      <div class="pres-row">
+        <div class="pres-time">45초</div>
+        <div style="flex:1;">
+          <textarea id="pres4" placeholder="기대 효과 & 소감" style="min-height:55px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">다른 팀 발표 피드백</label>
+      <div class="field-hint">⭐ 칭찬 / 🤔 질문 / 💡 제안 — 따뜻하고 구체적으로 써주세요</div>
+      <div style="overflow-x:auto;">
+        <table class="feedback-table">
+          <thead>
+            <tr>
+              <th style="width:80px;">팀 이름</th>
+              <th>⭐ 칭찬 (잘된 점)</th>
+              <th>🤔 질문 (궁금한 점)</th>
+              <th>💡 제안 (~하면 어떨까요?)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><input type="text" placeholder="팀명"></td><td><textarea></textarea></td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
+            <tr><td><input type="text" placeholder="팀명"></td><td><textarea></textarea></td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
+            <tr><td><input type="text" placeholder="팀명"></td><td><textarea></textarea></td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
+            <tr><td><input type="text" placeholder="팀명"></td><td><textarea></textarea></td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">오늘의 성찰 (개인 작성)</label>
+      <div class="field-group">
+        <label class="field-label" style="font-size:12px;font-weight:500;">오늘 가장 인상 깊었던 점</label>
+        <textarea id="reflect1" placeholder="수업에서 가장 기억에 남는 것은?" style="min-height:60px;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label" style="font-size:12px;font-weight:500;">직접 연구한다면 어떤 주제를 선택하고 싶나요?</label>
+        <textarea id="reflect2" placeholder="앞으로 탐구하고 싶은 주제" style="min-height:60px;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label" style="font-size:12px;font-weight:500;">연구방법론을 일상에서 어떻게 활용할 수 있을까요?</label>
+        <textarea id="reflect3" placeholder="오늘 배운 것을 일상에 적용해 본다면?" style="min-height:60px;"></textarea>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-prev" onclick="prev(4)">← 이전</button>
+      <button class="btn btn-submit" onclick="submitForm()">제출 완료 ✓</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: 완료 -->
+  <div class="section" id="sec5">
+    <div class="card result-card">
+      <div class="result-icon">🎉</div>
+      <h2>활동지 작성 완료!</h2>
+      <p>수고했습니다. 아래에서 작성 내용을 확인하고 인쇄할 수 있어요.</p>
+      <div class="result-summary" id="summaryBox"></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;">
+        <button class="btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
+        <button class="btn btn-prev" onclick="goStep(0)" style="margin-top:0;">처음부터 다시</button>
+      </div>
+      <p style="font-size:12px;color:#a0aec0;margin-top:1.5rem;">"오늘의 작은 질문이 세상을 바꾸는 연구가 됩니다!" 🚀</p>
+    </div>
+  </div>
+
 </div>
 
 <script>
-let current = 0;
+let currentStep = 0;
+const total = 6;
 
-// 자동 저장 기능
-document.querySelectorAll('input, textarea').forEach(el => {
-  el.value = localStorage.getItem(el.id) || '';
-  el.addEventListener('input', () => localStorage.setItem(el.id, el.value));
-});
+function goStep(n) {
+  document.getElementById('sec' + currentStep).classList.remove('active');
+  document.getElementById('sec' + n).classList.add('active');
+  currentStep = n;
+  updateDots();
+  window.scrollTo(0, 0);
+}
 
-function go(n) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec'+n).classList.add('active');
-  
-  const dots = document.querySelectorAll('.step-dot');
-  dots.forEach((d, i) => {
-    d.classList.toggle('active', i === n);
-    d.classList.toggle('done', i < n);
-  });
-  window.scrollTo(0,0);
+function next(from) { goStep(from + 1); }
+function prev(from) { goStep(from - 1); }
+
+function updateDots() {
+  for (let i = 0; i < total; i++) {
+    const d = document.getElementById('dot' + i);
+    if (!d) continue;
+    d.className = 'step-dot ' + (i < currentStep ? 'done' : i === currentStep ? 'active' : 'pending');
+  }
+}
+
+function toggleFiner(el) { el.classList.toggle('checked'); }
+function toggleMethod(el) { el.classList.toggle('selected'); }
+function toggleEthics(el) { el.classList.toggle('checked'); }
+
+function submitForm() {
+  const teamName = document.getElementById('teamName').value || '(미입력)';
+  const members = document.getElementById('teamMembers').value || '(미입력)';
+  const finalQ = document.getElementById('finalQ').value || '(미입력)';
+  const hypothesis = document.getElementById('hypothesis').value || '(미입력)';
+  const finerChecked = [...document.querySelectorAll('.finer-chip.checked')].map(e => e.querySelector('.letter').textContent).join(', ') || '없음';
+  const methods = [...document.querySelectorAll('.method-chip.selected')].map(e => e.querySelector('.m-name').textContent).join(', ') || '없음';
+  const ethicsAll = document.querySelectorAll('.ethics-check').length;
+  const ethicsDone = document.querySelectorAll('.ethics-check.checked').length;
+
+  document.getElementById('summaryBox').innerHTML = `
+    <div class="rs-row"><div class="rs-label">팀 이름</div><div class="rs-val">${teamName}</div></div>
+    <div class="rs-row"><div class="rs-label">팀원</div><div class="rs-val">${members}</div></div>
+    <div class="rs-row"><div class="rs-label">최종 연구 문제</div><div class="rs-val">${finalQ}</div></div>
+    <div class="rs-row"><div class="rs-label">가설</div><div class="rs-val">${hypothesis}</div></div>
+    <div class="rs-row"><div class="rs-label">FINER 충족</div><div class="rs-val">${finerChecked}</div></div>
+    <div class="rs-row"><div class="rs-label">연구 방법</div><div class="rs-val">${methods}</div></div>
+    <div class="rs-row"><div class="rs-label">윤리 점검</div><div class="rs-val">${ethicsDone} / ${ethicsAll} 항목 완료</div></div>
+  `;
+  goStep(5);
 }
 </script>
 </body>
