@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>연구방법론 특강 — 학생 활동지</title>
+<style>
+  /* 아이패드 및 모바일 최적화 스타일 */
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f6fa; color: #1a1a2e; line-height: 1.6; word-break: keep-all; }
+  
+  /* 헤더 및 진행바 고정 */
+  .page-header { background: #1a1a2e; color: #fff; padding: env(safe-area-inset-top) 1.5rem 1.5rem; text-align: center; }
+  .progress-bar { background: #16213e; padding: 0.75rem; display: flex; justify-content: center; align-items: center; gap: 8px; sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  
+  .step-dot { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; background: #2d3561; color: #8b9dc3; cursor: pointer; transition: 0.2s; }
+  .step-dot.active { background: #e94560; color: #fff; transform: scale(1.1); }
+  .step-dot.done { background: #27ae60; color: #fff; }
+  .step-line { width: 20px; height: 2px; background: #2d3561; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
+  .section { display: none; animation: slideIn 0.3s ease-out; }
+  .section.active { display: block; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card { background: #fff; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  
+  /* 입력창 최적화 */
+  input[type="text"], textarea { 
+    width: 100%; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px; 
+    font-size: 16px; /* 아이패드 자동 줌 방지 */
+    background: #fdfdfd; appearance: none; -webkit-appearance: none;
+  }
+  input:focus, textarea:focus { outline: none; border-color: #4a90d9; background: #fff; }
+
+  /* 버튼 스타일 */
+  .nav-row { display: flex; gap: 10px; position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 1rem; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+  .btn { flex: 1; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; }
+  .btn-prev { background: #edf2f7; color: #4a5568; }
+  .btn-next { background: #1a1a2e; color: #fff; }
+  .btn-submit { background: #e94560; color: #fff; }
+
+  @media print { .nav-row, .progress-bar { display: none; } .section { display: block !important; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>연구방법론 PBL 활동지</h1>
+  <p>팀별 미니 연구 계획서 작성</p>
+</div>
+
+<div class="progress-bar" id="dots">
+  <div class="step-dot active" onclick="go(0)">팀</div>
+  <div class="step-line"></div>
+  <div class="step-dot" onclick="go(1)">①</div>
+  <div class="step-line"></div>
+  <div class="step-dot" onclick="go(2)">②</div>
+  <div class="step-line"></div>
+  <div class="step-dot" onclick="go(3)">③</div>
+  <div class="step-line"></div>
+  <div class="step-dot" onclick="go(4)">④</div>
+</div>
+
+<div class="container">
+  <form id="pblForm">
+    <div class="section active" id="sec0">
+      <div class="card">
+        <h3>우리 팀 정보</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">내용은 기기에 자동으로 저장됩니다.</p>
+        <label>팀 이름</label>
+        <input type="text" name="teamName" id="teamName" placeholder="예: 뉴턴의 사과">
+        <label style="margin-top:15px; display:block;">팀원</label>
+        <input type="text" name="members" id="members" placeholder="이름을 쉼표로 구분">
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-next" onclick="go(1)">다음 단계로</button>
+      </div>
+    </div>
+
+    <div class="section" id="sec4">
+      <div class="card">
+        <h3>최종 제출</h3>
+        <p>모든 내용을 확인했나요? 인쇄 버튼을 눌러 PDF로 저장하세요.</p>
+        <div id="resultView" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:10px;"></div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-prev" onclick="go(3)">이전</button>
+        <button type="button" class="btn btn-submit" onclick="window.print()">PDF 저장 / 인쇄</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+let current = 0;
+
+// 자동 저장 기능
+document.querySelectorAll('input, textarea').forEach(el => {
+  el.value = localStorage.getItem(el.id) || '';
+  el.addEventListener('input', () => localStorage.setItem(el.id, el.value));
+});
+
+function go(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec'+n).classList.add('active');
+  
+  const dots = document.querySelectorAll('.step-dot');
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i === n);
+    d.classList.toggle('done', i < n);
+  });
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
